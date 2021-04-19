@@ -1,0 +1,18 @@
+----Iniciar projeto Scrapy----
+scrapy startproject quotetutorial
+
+----Executar o Scripy------
+scrapy crawl "nome_do_projeto que criamos dentro da pasta spiders, nesse caso é: 'quotes'"
+
+
+------Abrir o shell-----------
+scrapy shell "URL"
+
+----------Gerar Arquivo json--------
+scrapy crawl name_projeto -o nome_arquivo.json
+
+----------Gerar Arquivo csv--------
+scrapy crawl name_projeto -o nome_arquivo.csv
+
+----------Gerar Arquivo xml--------
+scrapy crawl name_projeto -o nome_arquivo.xml

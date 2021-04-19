@@ -9,9 +9,20 @@ client = ScraperAPIClient(API)
 
 class StatusinvestSpider(scrapy.Spider):
     name = 'statusinvest'
+
+    setoresLista = ['indice-de-consumo', 'indice-carbono-eficiente', 'indice-de-energia-eletrica', 'indice-financeiro',
+                    'indice-de-materiais-basicos', 'indice-de-materiais-basicos', 'indice-imobiliario', 'indice-do-setor-industrial', 'indice-utilidade-publica']
+    setores = []
     start_urls = [
         client.scrapyGet('https://statusinvest.com.br/acoes/busca-avancada')
     ]
+
+    # def parse(self, response):
+    #     setor_url = "https://statusinvest.com.br/acao/getaltabaixa?IndiceCode="
+
+    #     for setor in self.setoresLista:
+    #         setores_url = setor_url+setor
+    #         yield scrapy.Request(setores_url, callback=self.parse_setores)
 
     def parse(self, response):
         url = "https://statusinvest.com.br/category/advancedsearchresult?search=%7B%22Sector%22%3A%22%22%2C%22SubSector%22%3A%22%22%2C%22Segment%22%3A%22%22%2C%22my_range%22%3A%220%3B25%22%2C%22dy%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_L%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22peg_Ratio%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_VP%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_Ativo%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22margemBruta%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22margemEbit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22margemLiquida%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_Ebit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22eV_Ebit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22dividaLiquidaEbit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22dividaliquidaPatrimonioLiquido%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_SR%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_CapitalGiro%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_AtivoCirculante%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22roe%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22roic%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22roa%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22liquidezCorrente%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22pl_Ativo%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22passivo_Ativo%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22giroAtivos%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22receitas_Cagr5%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22lucros_Cagr5%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22liquidezMediaDiaria%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22vpa%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22lpa%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22valorMercado%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%7D&CategoryType=1"
@@ -20,17 +31,44 @@ class StatusinvestSpider(scrapy.Spider):
 
     def parse_api(self, response):
         base_url = "https://statusinvest.com.br/acoes/"
+        setor_url = "https://statusinvest.com.br/acao/getaltabaixa?IndiceCode="
+
         raw_data = response.body
         data = json.loads(raw_data)
+
+        for setor in self.setoresLista:
+            setores_url = setor_url+setor
+            yield scrapy.Request(setores_url, callback=self.parse_setores)
 
         for status in data:
             papel = status['ticker']
             status_url = base_url+papel
             yield scrapy.Request(client.scrapyGet(status_url), callback=self.parse_status)
 
+    def parse_setores(self, response):
+        setor = []
+        setor = response.url.split(sep='=')
+
+        raw_data = response.body
+        data = json.loads(raw_data)
+
+        for dados in data:
+            setoresAtivo = {}
+            setoresAtivo[setor[1]] = dados['code']
+            self.setores.append(setoresAtivo)
+
     def parse_status(self, response):
         items = StatusItem()
         ticker = response.css(".fw-900.active::text").get()
+        empresa = response.css('#main-header small::text').get()
+        indice = ''
+
+        for setor in self.setores:
+            for se in setor.keys():
+                if ticker == setor[se]:
+                    indice = se
+                    # print(f"setor:{se} - ticket: {setor[se]}")
+
         valorAtual = response.css('.value::text').get()
         minCiquentaDuaSemana = response.css(
             ".w-100+ .w-lg-20 .value::text").get()
@@ -101,14 +139,19 @@ class StatusinvestSpider(scrapy.Spider):
         cagrLucrosCincoAnos = response.css(
             '.w-lg-33~ .w-lg-33+ .w-lg-33 .item+ .item .fw-700::text').get()
 
+        items['indice'] = indice
         items['ticker'] = ticker
+        items['empresa'] = empresa
         items['valorAtual'] = valorAtual
         items['minCiquentaDuaSemana'] = minCiquentaDuaSemana
         items['maxCiquentaDuaSemana'] = maxCiquentaDuaSemana
         items['minMes'] = minMes
         items['maxMes'] = maxMes
         items['valorizacaoBaseDiaAnterior'] = valorizacaoBaseDiaAnterior
-        items['dy'] = dy
+        if dy.replace(',', '.').replace('-', '') == '':
+            items['dy'] = 0
+        else:
+            items['dy'] = float(dy.replace(',', '.'))
         items['somaDyDozeMeses'] = somaDyDozeMeses
         items['valorizacaoAtivoDozeMeses'] = valorizacaoAtivoDozeMeses
         items['valorizacaoMesAtual'] = valorizacaoMesAtual

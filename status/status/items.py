@@ -8,7 +8,9 @@ import scrapy
 
 class StatusItem(scrapy.Item):
     # define the fields for your item here like:
+    indice = scrapy.Field()
     ticker = scrapy.Field()
+    empresa = scrapy.Field()
     valorAtual = scrapy.Field()
     minCiquentaDuaSemana = scrapy.Field()
     maxCiquentaDuaSemana = scrapy.Field()
