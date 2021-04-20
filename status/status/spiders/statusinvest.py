@@ -142,48 +142,219 @@ class StatusinvestSpider(scrapy.Spider):
         items['indice'] = indice
         items['ticker'] = ticker
         items['empresa'] = empresa
-        items['valorAtual'] = valorAtual
-        items['minCiquentaDuaSemana'] = minCiquentaDuaSemana
-        items['maxCiquentaDuaSemana'] = maxCiquentaDuaSemana
-        items['minMes'] = minMes
-        items['maxMes'] = maxMes
+
+        if valorAtual.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['valorAtual'] = 0
+        else:
+            items['valorAtual'] = float(
+                valorAtual.replace('.', '').replace(',', '.'))
+
+        if minCiquentaDuaSemana.replace(',', '.').replace('-', '') == '':
+            items['minCiquentaDuaSemana'] = 0
+        else:
+            items['minCiquentaDuaSemana'] = float(
+                minCiquentaDuaSemana.replace(',', '.'))
+
+        if maxCiquentaDuaSemana.replace(',', '.').replace('-', '') == '':
+            items['maxCiquentaDuaSemana'] = 0
+        else:
+            items['maxCiquentaDuaSemana'] = float(
+                maxCiquentaDuaSemana.replace(',', '.'))
+
+        if minMes.replace('R$ -', '') == '':
+            items['minMes'] = 'R$ 0,00'
+        else:
+            items['minMes'] = minMes
+
+        if maxMes.replace('R$ -', '') == '':
+            items['maxMes'] = 'R$ 0,00'
+        else:
+            items['maxMes'] = maxMes
+
         items['valorizacaoBaseDiaAnterior'] = valorizacaoBaseDiaAnterior
+
         if dy.replace(',', '.').replace('-', '') == '':
             items['dy'] = 0
         else:
             items['dy'] = float(dy.replace(',', '.'))
         items['somaDyDozeMeses'] = somaDyDozeMeses
-        items['valorizacaoAtivoDozeMeses'] = valorizacaoAtivoDozeMeses
-        items['valorizacaoMesAtual'] = valorizacaoMesAtual
+
+        if valorizacaoAtivoDozeMeses.replace('-%', '') == '':
+            items['valorizacaoAtivoDozeMeses'] = '0,00%'
+        else:
+            items['valorizacaoAtivoDozeMeses'] = valorizacaoAtivoDozeMeses
+
+        if valorizacaoMesAtual.replace('-%', '') == '':
+            items['valorizacaoMesAtual'] = '0,00%'
+        else:
+            items['valorizacaoMesAtual'] = valorizacaoMesAtual
+
         items['tipoAtivo'] = tipoAtivo
-        items['pl'] = pl
-        items['pegRatio'] = pegRatio
-        items['pvp'] = pvp
-        items['evEbitida'] = evEbitida
-        items['evEbit'] = evEbit
-        items['pEbitida'] = pEbitida
-        items['pEbit'] = pEbit
-        items['vpa'] = vpa
-        items['pativo'] = pativo
-        items['lpa'] = lpa
-        items['psr'] = psr
-        items['pCapGiro'] = pCapGiro
-        items['pAtivoCircLiq'] = pAtivoCircLiq
-        items['divLiquidaPl'] = divLiquidaPl
-        items['divLiquidaEbitida'] = divLiquidaEbitida
-        items['divLiquidaEbit'] = divLiquidaEbit
-        items['plAtivo'] = plAtivo
-        items['passivoAtivo'] = passivoAtivo
-        items['liqCorrente'] = liqCorrente
-        items['mBruta'] = mBruta
-        items['mEbitda'] = mEbitda
-        items['mEbit'] = mEbit
-        items['mliquida'] = mliquida
-        items['roe'] = roe
-        items['roa'] = roa
-        items['roic'] = roic
-        items['giroAtivos'] = giroAtivos
-        items['cagrReceitasCincoAnos'] = cagrReceitasCincoAnos
-        items['cagrLucrosCincoAnos'] = cagrLucrosCincoAnos
+
+        if pl.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['pl'] = 0
+        else:
+            items['pl'] = float(pl.replace('.', '').replace(',', '.'))
+
+        if pegRatio.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['pegRatio'] = 0
+        else:
+            items['pegRatio'] = float(
+                pegRatio.replace('.', '').replace(',', '.'))
+
+        if pvp.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['pvp'] = 0
+        else:
+            items['pvp'] = float(pvp.replace('.', '').replace(',', '.'))
+
+        if evEbitida.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['evEbitida'] = 0
+        else:
+            items['evEbitida'] = float(
+                evEbitida.replace('.', '').replace(',', '.'))
+
+        if evEbit.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['evEbit'] = 0
+        else:
+            items['evEbit'] = float(evEbit.replace('.', '').replace(',', '.'))
+
+        if pEbitida.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['pEbitida'] = 0
+        else:
+            items['pEbitida'] = float(
+                pEbitida.replace('.', '').replace(',', '.'))
+
+        if pEbit.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['pEbit'] = 0
+        else:
+            items['pEbit'] = float(pEbit.replace('.', '').replace(',', '.'))
+
+        if vpa.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['vpa'] = 0
+        else:
+            items['vpa'] = float(vpa.replace('.', '').replace(',', '.'))
+
+        if pativo.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['pativo'] = 0
+        else:
+            items['pativo'] = float(pativo.replace('.', '').replace(',', '.'))
+
+        if lpa.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['lpa'] = 0
+        else:
+            items['lpa'] = float(lpa.replace('.', '').replace(',', '.'))
+
+        if psr.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['psr'] = 0
+        else:
+            items['psr'] = float(psr.replace('.', '').replace(',', '.'))
+
+        if pCapGiro.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['pCapGiro'] = 0
+        else:
+            items['pCapGiro'] = float(
+                pCapGiro.replace('.', '').replace(',', '.'))
+
+        if pAtivoCircLiq.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['pAtivoCircLiq'] = 0
+        else:
+            items['pAtivoCircLiq'] = float(
+                pAtivoCircLiq.replace('.', '').replace(',', '.'))
+
+        if divLiquidaPl.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['divLiquidaPl'] = 0
+        else:
+            items['divLiquidaPl'] = float(
+                divLiquidaPl.replace('.', '').replace(',', '.'))
+
+        if divLiquidaEbitida.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['divLiquidaEbitida'] = 0
+        else:
+            items['divLiquidaEbitida'] = float(
+                divLiquidaEbitida.replace('.', '').replace(',', '.'))
+
+        if divLiquidaEbit.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['divLiquidaEbit'] = 0
+        else:
+            items['divLiquidaEbit'] = float(
+                divLiquidaEbit.replace('.', '').replace(',', '.'))
+
+        if plAtivo.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['plAtivo'] = 0
+        else:
+            items['plAtivo'] = float(
+                plAtivo.replace('.', '').replace(',', '.'))
+
+        if passivoAtivo.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['passivoAtivo'] = 0
+        else:
+            items['passivoAtivo'] = float(
+                passivoAtivo.replace('.', '').replace(',', '.'))
+
+        if liqCorrente.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['liqCorrente'] = 0
+        else:
+            items['liqCorrente'] = float(
+                liqCorrente.replace('.', '').replace(',', '.'))
+
+        if mBruta.replace('.', '').replace(',', '.').replace('-', '').replace('%', '') == '':
+            items['mBruta'] = 0
+        else:
+            items['mBruta'] = float(mBruta.replace(
+                '.', '').replace(',', '.').replace('%', ''))
+
+        if mEbitda.replace('.', '').replace(',', '.').replace('-', '').replace('%', '') == '':
+            items['mEbitda'] = 0
+        else:
+            items['mEbitda'] = float(mEbitda.replace(
+                '.', '').replace(',', '.').replace('%', ''))
+
+        if mEbit.replace('.', '').replace(',', '.').replace('-', '').replace('%', '') == '':
+            items['mEbit'] = 0
+        else:
+            items['mEbit'] = float(mEbit.replace(
+                '.', '').replace(',', '.').replace('%', ''))
+
+        if mliquida.replace('.', '').replace(',', '.').replace('-', '').replace('%', '') == '':
+            items['mliquida'] = 0
+        else:
+            items['mliquida'] = float(mliquida.replace(
+                '.', '').replace(',', '.').replace('%', ''))
+
+        if roe.replace('.', '').replace(',', '.').replace('-', '').replace('%', '') == '':
+            items['roe'] = 0
+        else:
+            items['roe'] = float(roe.replace(
+                '.', '').replace(',', '.').replace('%', ''))
+
+        if roa.replace('.', '').replace(',', '.').replace('-', '').replace('%', '') == '':
+            items['roa'] = 0
+        else:
+            items['roa'] = float(roa.replace(
+                '.', '').replace(',', '.').replace('%', ''))
+
+        if roic.replace('.', '').replace(',', '.').replace('-', '').replace('%', '') == '':
+            items['roic'] = 0
+        else:
+            items['roic'] = float(roic.replace(
+                '.', '').replace(',', '.').replace('%', ''))
+
+        if giroAtivos.replace('.', '').replace(',', '.').replace('-', '') == '':
+            items['giroAtivos'] = 0
+        else:
+            items['giroAtivos'] = float(
+                giroAtivos.replace('.', '').replace(',', '.'))
+
+        if cagrReceitasCincoAnos.replace('.', '').replace(',', '.').replace('-', '').replace('%', '') == '':
+            items['cagrReceitasCincoAnos'] = 0
+        else:
+            items['cagrReceitasCincoAnos'] = float(
+                cagrReceitasCincoAnos.replace('.', '').replace(',', '.').replace('%', ''))
+
+        if cagrLucrosCincoAnos.replace('.', '').replace(',', '.').replace('-', '').replace('%', '') == '':
+            items['cagrLucrosCincoAnos'] = 0
+        else:
+            items['cagrLucrosCincoAnos'] = float(cagrLucrosCincoAnos.replace(
+                '.', '').replace(',', '.').replace('%', ''))
 
         yield items
