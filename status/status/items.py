@@ -51,3 +51,5 @@ class StatusItem(scrapy.Item):
     giroAtivos = scrapy.Field()
     cagrReceitasCincoAnos = scrapy.Field()
     cagrLucrosCincoAnos = scrapy.Field()
+    valorIntriseco = scrapy.Field()
+    margemSeguranca = scrapy.Field()

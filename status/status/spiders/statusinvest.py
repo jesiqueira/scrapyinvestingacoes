@@ -1,5 +1,6 @@
 import scrapy
 import json
+from math import sqrt
 from ..items import StatusItem
 from ..config import API
 
@@ -10,8 +11,29 @@ client = ScraperAPIClient(API)
 class StatusinvestSpider(scrapy.Spider):
     name = 'statusinvest'
 
-    setoresLista = ['indice-de-consumo', 'indice-carbono-eficiente', 'indice-de-energia-eletrica', 'indice-financeiro',
-                    'indice-de-materiais-basicos', 'indice-de-materiais-basicos', 'indice-imobiliario', 'indice-do-setor-industrial', 'indice-utilidade-publica']
+    setoresLista = [
+        'indice-de-consumo',
+        'indice-carbono-eficiente',
+        'indice-de-energia-eletrica',
+        'indice-financeiro',
+        'indice-de-materiais-basicos',
+        'indice-imobiliario',
+        'indice-do-setor-industrial',
+        'indice-utilidade-publica',
+        'indice-small-cap',
+        'indice-midlarge-cap',
+        'indice-valor',
+        'indice-de-acoes-com-tag-along-diferenciado',
+        'indice-de-sustentabilidade-empresarial',
+        'indice-de-governanca-corporativa-–-novo-mercado',
+        'indice-de-acoes-com-governanca-corporativa-diferenciada',
+        'indice-de-governanca-corporativa-trade',
+        'indice-brasil-50',
+        'indice-brasil-100',
+        'indice-brasil-amplo',
+        'indice-small-cap',
+        'indice-dividendos'
+    ]
     setores = []
     start_urls = [
         client.scrapyGet('https://statusinvest.com.br/acoes/busca-avancada')
@@ -70,6 +92,12 @@ class StatusinvestSpider(scrapy.Spider):
                     # print(f"setor:{se} - ticket: {setor[se]}")
 
         valorAtual = response.css('.value::text').get()
+        if valorAtual.replace('.', '').replace(',', '.').replace('-', '') == '':
+            valorAtual = 0
+        else:
+            valorAtual = float(
+                valorAtual.replace('.', '').replace(',', '.'))
+
         minCiquentaDuaSemana = response.css(
             ".w-100+ .w-lg-20 .value::text").get()
         maxCiquentaDuaSemana = response.css(
@@ -88,12 +116,23 @@ class StatusinvestSpider(scrapy.Spider):
         valorizacaoMesAtual = response.css(
             ".w-lg-20 .justify-between .v-align-middle::text").get()
         tipoAtivo = response.css(".mb-1+ .value::text").get()
+
         pl = response.css(
             ".w-100:nth-child(1) .item:nth-child(2) .fw-700::text").get()
+        if pl.replace('.', '').replace(',', '.').replace('-', '') == '':
+            pl = 0
+        else:
+            pl = float(pl.replace('.', '').replace(',', '.'))
+        
         pegRatio = response.css(
             ".item:nth-child(3) .uppercase+ .pr-2 .fw-700::text").get()
         pvp = response.css(
             ".w-lg-16_6:nth-child(4) .align-items-center+ .pr-2 .fw-700::text").get()
+        if pvp.replace('.', '').replace(',', '.').replace('-', '') == '':
+            pvp = 0
+        else:
+            pvp = float(pvp.replace('.', '').replace(',', '.'))
+
         evEbitida = response.css(
             ".item:nth-child(5) .align-items-center+ .pr-2 .fw-700::text").get()
         evEbit = response.css(
@@ -101,8 +140,18 @@ class StatusinvestSpider(scrapy.Spider):
         pEbitida = response.css(".item:nth-child(7) .fw-700::text").get()
         pEbit = response.css(".item:nth-child(8) .fw-700::text").get()
         vpa = response.css('.item:nth-child(9) .fw-700::text').get()
+        if vpa.replace('.', '').replace(',', '.').replace('-', '') == '':
+            vpa = 0
+        else:
+            vpa = float(vpa.replace('.', '').replace(',', '.'))
+
         pativo = response.css('.item:nth-child(10) .fw-700::text').get()
         lpa = response.css('.item:nth-child(11) .fw-700::text').get()
+        if lpa.replace('.', '').replace(',', '.').replace('-', '') == '':
+            lpa = 0
+        else:
+            lpa = float(lpa.replace('.', '').replace(',', '.'))
+
         psr = response.css('.item:nth-child(12) .fw-700::text').get()
         pCapGiro = response.css('.item:nth-child(13) .fw-700::text').get()
         pAtivoCircLiq = response.css('.item:nth-child(14) .fw-700::text').get()
@@ -142,12 +191,7 @@ class StatusinvestSpider(scrapy.Spider):
         items['indice'] = indice
         items['ticker'] = ticker
         items['empresa'] = empresa
-
-        if valorAtual.replace('.', '').replace(',', '.').replace('-', '') == '':
-            items['valorAtual'] = 0
-        else:
-            items['valorAtual'] = float(
-                valorAtual.replace('.', '').replace(',', '.'))
+        items['valorAtual'] = valorAtual        
 
         if minCiquentaDuaSemana.replace(',', '.').replace('-', '') == '':
             items['minCiquentaDuaSemana'] = 0
@@ -191,10 +235,7 @@ class StatusinvestSpider(scrapy.Spider):
 
         items['tipoAtivo'] = tipoAtivo
 
-        if pl.replace('.', '').replace(',', '.').replace('-', '') == '':
-            items['pl'] = 0
-        else:
-            items['pl'] = float(pl.replace('.', '').replace(',', '.'))
+        items['pl'] = pl
 
         if pegRatio.replace('.', '').replace(',', '.').replace('-', '') == '':
             items['pegRatio'] = 0
@@ -202,10 +243,7 @@ class StatusinvestSpider(scrapy.Spider):
             items['pegRatio'] = float(
                 pegRatio.replace('.', '').replace(',', '.'))
 
-        if pvp.replace('.', '').replace(',', '.').replace('-', '') == '':
-            items['pvp'] = 0
-        else:
-            items['pvp'] = float(pvp.replace('.', '').replace(',', '.'))
+        items['pvp'] = pvp
 
         if evEbitida.replace('.', '').replace(',', '.').replace('-', '') == '':
             items['evEbitida'] = 0
@@ -229,20 +267,14 @@ class StatusinvestSpider(scrapy.Spider):
         else:
             items['pEbit'] = float(pEbit.replace('.', '').replace(',', '.'))
 
-        if vpa.replace('.', '').replace(',', '.').replace('-', '') == '':
-            items['vpa'] = 0
-        else:
-            items['vpa'] = float(vpa.replace('.', '').replace(',', '.'))
+        items['vpa'] = vpa
 
         if pativo.replace('.', '').replace(',', '.').replace('-', '') == '':
             items['pativo'] = 0
         else:
             items['pativo'] = float(pativo.replace('.', '').replace(',', '.'))
 
-        if lpa.replace('.', '').replace(',', '.').replace('-', '') == '':
-            items['lpa'] = 0
-        else:
-            items['lpa'] = float(lpa.replace('.', '').replace(',', '.'))
+        items['lpa'] = lpa
 
         if psr.replace('.', '').replace(',', '.').replace('-', '') == '':
             items['psr'] = 0
@@ -356,5 +388,10 @@ class StatusinvestSpider(scrapy.Spider):
         else:
             items['cagrLucrosCincoAnos'] = float(cagrLucrosCincoAnos.replace(
                 '.', '').replace(',', '.').replace('%', ''))
+        
+        valorIntriseco = sqrt((pl*pvp)*lpa*vpa)
+        margemSeguranca = valorIntriseco - valorAtual
+        items['valorIntriseco'] = valorIntriseco
+        items['margemSeguranca'] = margemSeguranca
 
         yield items
