@@ -53,3 +53,4 @@ class StatusItem(scrapy.Item):
     cagrLucrosCincoAnos = scrapy.Field()
     valorIntriseco = scrapy.Field()
     margemSeguranca = scrapy.Field()
+    setorBtres = scrapy.Field()

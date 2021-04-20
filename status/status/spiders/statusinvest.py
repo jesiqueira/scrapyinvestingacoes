@@ -3,6 +3,7 @@ import json
 from math import sqrt
 from ..items import StatusItem
 from ..config import API
+from pprint import pprint
 
 from scraper_api import ScraperAPIClient
 client = ScraperAPIClient(API)
@@ -35,21 +36,60 @@ class StatusinvestSpider(scrapy.Spider):
         'indice-dividendos'
     ]
     setores = []
+    empresaB3 = []
     start_urls = [
-        client.scrapyGet('https://statusinvest.com.br/acoes/busca-avancada')
+        'https://statusinvest.com.br/acoes/busca-avancada'
+        # client.scrapyGet('https://statusinvest.com.br/acoes/busca-avancada')
     ]
 
-    # def parse(self, response):
-    #     setor_url = "https://statusinvest.com.br/acao/getaltabaixa?IndiceCode="
-
-    #     for setor in self.setoresLista:
-    #         setores_url = setor_url+setor
-    #         yield scrapy.Request(setores_url, callback=self.parse_setores)
-
     def parse(self, response):
+        setor_url = "https://www.infomoney.com.br/cotacoes/empresas-b3/"
+
+        # yield scrapy.Request(client.scrapyGet(setor_url), callback=self.parse_empresas)
+        yield scrapy.Request(setor_url, callback=self.parse_empresas)
+
+    def parse_empresas(self, response):
+
         url = "https://statusinvest.com.br/category/advancedsearchresult?search=%7B%22Sector%22%3A%22%22%2C%22SubSector%22%3A%22%22%2C%22Segment%22%3A%22%22%2C%22my_range%22%3A%220%3B25%22%2C%22dy%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_L%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22peg_Ratio%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_VP%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_Ativo%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22margemBruta%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22margemEbit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22margemLiquida%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_Ebit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22eV_Ebit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22dividaLiquidaEbit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22dividaliquidaPatrimonioLiquido%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_SR%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_CapitalGiro%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_AtivoCirculante%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22roe%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22roic%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22roa%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22liquidezCorrente%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22pl_Ativo%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22passivo_Ativo%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22giroAtivos%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22receitas_Cagr5%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22lucros_Cagr5%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22liquidezMediaDiaria%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22vpa%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22lpa%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22valorMercado%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%7D&CategoryType=1"
 
+        dic_setores_b3 = {}
+        dic_setores_b3['BensIndustriais'] = response.css(
+            "#bens_industriais a::text").getall()
+        dic_setores_b3['ConsumoCiclico'] = response.css(
+            "#consumo-ciclico a::text").getall()
+        dic_setores_b3['ConsumoNaoCiclico'] = response.css(
+            "#consumo_nao_ciclico a::text").getall()
+        dic_setores_b3['Financeiro'] = response.css(
+            "#financeiro a::text").getall()
+        dic_setores_b3['MateriaisBasicos'] = response.css(
+            "#bateriais_basicos a::text").getall()
+        dic_setores_b3['Outros'] = response.css("#outros a::text").getall()
+        dic_setores_b3['PetroleoGasBiocombustiveis'] = response.css(
+            "#petroleo_gas_e_biocombustiveis a::text").getall()
+        dic_setores_b3['Saude'] = response.css("#saude a::text").getall()
+        dic_setores_b3['TecnologiaInformacao'] = response.css(
+            "#tecnologia_da_informacao a::text").getall()
+        dic_setores_b3['Telecomunicacoes'] = response.css(
+            "#telecomunicacoes a::text").getall()
+        dic_setores_b3['UtilidadePublica'] = response.css(
+            "#utilidade-publica a::text").getall()
+
+        self.empresaB3.append(dic_setores_b3)
+
         yield scrapy.Request(url, callback=self.parse_api)
+
+        # for setor in self.empresaB3:
+        #     for s in setor.keys():
+        #         # pprint(f"{s} - {setor[s]}")
+        #         for st in setor[s]:
+        #             if st.strip()[-1] == 'F':
+        #                 print("Tem IF")
+        #                 pprint(f"{s} - {st.strip()[:-1]}")
+
+    # def parse_status(self, response):
+    #     url = "https://statusinvest.com.br/category/advancedsearchresult?search=%7B%22Sector%22%3A%22%22%2C%22SubSector%22%3A%22%22%2C%22Segment%22%3A%22%22%2C%22my_range%22%3A%220%3B25%22%2C%22dy%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_L%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22peg_Ratio%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_VP%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_Ativo%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22margemBruta%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22margemEbit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22margemLiquida%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_Ebit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22eV_Ebit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22dividaLiquidaEbit%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22dividaliquidaPatrimonioLiquido%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_SR%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_CapitalGiro%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22p_AtivoCirculante%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22roe%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22roic%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22roa%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22liquidezCorrente%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22pl_Ativo%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22passivo_Ativo%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22giroAtivos%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22receitas_Cagr5%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22lucros_Cagr5%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22liquidezMediaDiaria%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22vpa%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22lpa%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%2C%22valorMercado%22%3A%7B%22Item1%22%3Anull%2C%22Item2%22%3Anull%7D%7D&CategoryType=1"
+
+    #     yield scrapy.Request(url, callback=self.parse_api)
 
     def parse_api(self, response):
         base_url = "https://statusinvest.com.br/acoes/"
@@ -65,7 +105,8 @@ class StatusinvestSpider(scrapy.Spider):
         for status in data:
             papel = status['ticker']
             status_url = base_url+papel
-            yield scrapy.Request(client.scrapyGet(status_url), callback=self.parse_status)
+            # yield scrapy.Request(client.scrapyGet(status_url), callback=self.parse_status)
+            yield scrapy.Request(status_url, callback=self.parse_status)
 
     def parse_setores(self, response):
         setor = []
@@ -90,6 +131,17 @@ class StatusinvestSpider(scrapy.Spider):
                 if ticker == setor[se]:
                     indice = se
                     # print(f"setor:{se} - ticket: {setor[se]}")
+
+        setorBtres = ''
+        for setor in self.empresaB3:
+            for s in setor.keys():
+                for st in setor[s]:
+                    if st.strip()[-1] == 'F':
+                        if ticker == st.strip()[:-1]:
+                            setorBtres = s
+                    else:
+                        if ticker == st.strip():
+                            setorBtres = s
 
         valorAtual = response.css('.value::text').get()
         if valorAtual.replace('.', '').replace(',', '.').replace('-', '') == '':
@@ -123,7 +175,7 @@ class StatusinvestSpider(scrapy.Spider):
             pl = 0
         else:
             pl = float(pl.replace('.', '').replace(',', '.'))
-        
+
         pegRatio = response.css(
             ".item:nth-child(3) .uppercase+ .pr-2 .fw-700::text").get()
         pvp = response.css(
@@ -191,7 +243,7 @@ class StatusinvestSpider(scrapy.Spider):
         items['indice'] = indice
         items['ticker'] = ticker
         items['empresa'] = empresa
-        items['valorAtual'] = valorAtual        
+        items['valorAtual'] = valorAtual
 
         if minCiquentaDuaSemana.replace(',', '.').replace('-', '') == '':
             items['minCiquentaDuaSemana'] = 0
@@ -388,10 +440,11 @@ class StatusinvestSpider(scrapy.Spider):
         else:
             items['cagrLucrosCincoAnos'] = float(cagrLucrosCincoAnos.replace(
                 '.', '').replace(',', '.').replace('%', ''))
-        
+
         valorIntriseco = sqrt((pl*pvp)*lpa*vpa)
         margemSeguranca = valorIntriseco - valorAtual
         items['valorIntriseco'] = valorIntriseco
         items['margemSeguranca'] = margemSeguranca
+        items['setorBtres'] = setorBtres
 
         yield items
