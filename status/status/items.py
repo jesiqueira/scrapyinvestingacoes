@@ -11,6 +11,8 @@ class StatusItem(scrapy.Item):
     indice = scrapy.Field()
     ticker = scrapy.Field()
     empresa = scrapy.Field()
+    empresas_semelhantes = scrapy.Field()
+    nome = scrapy.Field()
     valorAtual = scrapy.Field()
     minCiquentaDuaSemana = scrapy.Field()
     maxCiquentaDuaSemana = scrapy.Field()

@@ -124,8 +124,12 @@ class StatusinvestSpider(scrapy.Spider):
         items = StatusItem()
         ticker = response.css(".fw-900.active::text").get()
         empresa = response.css('#main-header small::text').get()
-        indice = ''
+        nome = response.css('#company-section .text-main-green-dark::text').get()
+        semelhantes = response.css("#company-section .mt-1 a").xpath("@href").getall()
+        semelhantes = [l.split('/')[-1].upper() for l in semelhantes]
+        empresas_semelhantes = ','.join(semelhantes)
 
+        indice = ''
         for setor in self.setores:
             for se in setor.keys():
                 if ticker == setor[se]:
@@ -161,8 +165,15 @@ class StatusinvestSpider(scrapy.Spider):
         valorizacaoBaseDiaAnterior = response.css(
             ".fs-md-3 .v-align-middle::text").get()
         dy = response.css(".w-lg-20 .legend-tooltip+ .value::text").get()
+        
         somaDyDozeMeses = response.css(
-            ".border-lg-1+ .w-md-50 .sub-value::text").get()
+            ".border-lg-1+ .w-md-50 .sub-value::text").get() 
+        
+        if somaDyDozeMeses.replace('R$','').replace('%','').replace('-','').replace('.', '').replace(',', '.') == '':
+            somaDyDozeMeses = 0
+        else:
+            somaDyDozeMeses = float(somaDyDozeMeses.replace('R$','').replace('%','').replace('-','').replace('.', '').replace(',', '.'))
+
         valorizacaoAtivoDozeMeses = response.css(
             ".w-md-50 .icon+ .value::text").get()
         valorizacaoMesAtual = response.css(
@@ -243,6 +254,8 @@ class StatusinvestSpider(scrapy.Spider):
         items['indice'] = indice
         items['ticker'] = ticker
         items['empresa'] = empresa
+        items['empresas_semelhantes'] = empresas_semelhantes
+        items['nome'] = nome
         items['valorAtual'] = valorAtual
 
         if minCiquentaDuaSemana.replace(',', '.').replace('-', '') == '':
